@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+<meta charset="UTF-8">
+<title>loadDataFromExternalSource</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js">
+<!-- script src="jquery.min.js" -->
+<!-- script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.js" -->
+<!--script src="jquery.js" -->
+</script>
+<script src="FileSaver.js">
+</script>
+<script src="Blob.js">
+</script>
+<!--script src="canvas-toBlob.js">
+</script-->
+<script src="steps_v2.js">
+</script>
+    <!--script type="text/javascript">
+      function toggleDiv(divid,newDisplay,optionalPrefix) { 
+        var useNewDisplay = 'block' ;
+        if ( newDisplay ) {
+          useNewDisplay = newDisplay ;
+        }
+        if(document.getElementById(divid).style.display == 'none') {
+          document.getElementById(divid).style.display = useNewDisplay;
+          var id2 = divid + '_toggler' ;
+          var sub = document.getElementById(id2).getElementsByTagName("a") ;
+          sub[0].innerHTML = "&#x25BC;" ;
+          sub[1].innerHTML = optionalPrefix ;
+        } else {
+          document.getElementById(divid).style.display = 'none';
+          var id2 = divid + '_toggler' ;
+          var sub = document.getElementById(id2).getElementsByTagName("a") ;
+          sub[0].innerHTML = "&#x25B6;" ;
+          sub[1].innerHTML = optionalPrefix ;
+        }
+      }
+    </script-->
+<script>
+//<![CDATA[
+var stepConfig = {
+  elemStruct: {
+    'stepDiv': ['stepLeft', 'stepBody', 'stepFoot'],
+    'stepBody': ['stepSum', 'stepDesc', 'stepData', 'stepSubs'],
+    'stepLeft': ['stepNum', 'stepStat', 'stepChecks'],
+    'stepChecks': ['stepDoneWrap', 'stepSkipWrap', 'stepFailWrap'],
+    'stepDoneWrap': ['stepDone'],
+    'stepSkipWrap': ['stepSkip'],
+    'stepFailWrap': ['stepFail'],
+  },
+  defaultDataTypes: [
+    'notes',
+  ],
+  dataTypes: {
+    'notes': {'rows': 4},
+    'measurement1': {'rows': 1},
+  },
+} ;
+$(document).ready(function() {
+  //$(".checkbox").change(function() {
+  $( "input:checkbox" ).change(function() {
+    if(this.checked) {
+      var d=new Date();
+      alert( d.toISOString() + ' ' + this.id) ;
+    }
+  });
+  function persistTextarea(id){
+    var elem = $("#" + id ) ;
+    if ('textarea' != elem.attr('tag') ) {
+      elem = $("#" + id + " textarea") ;
+    }
+    elem.html(elem.val()) ;
+  } ;
+  $('#step2_note textarea').keyup(function(){persistTextarea('step2_note')}) ;
+  $('#step2_note textarea').change(function(){persistTextarea('step2_note')}) ;
+});
+//]]>
+</script>
+<style type="text/css">
+div.stepDiv {
+  border:2px solid;
+  border-radius:20px;
+  padding:10px 4px 7px 10px;
+}
+div.stepLeft {
+  float:left;
+  border:1px solid;
+  border-radius:20px;
+  padding:5px 5px;
+  max-width: 25%;
+}
+div.stepBody {
+  /* float:left;
+  max-width: 83%;
+  min-width: 70%;
+  margin:5px 1px 2px 5px; */
+  margin:0 0 0 70px ;
+  
+}
+div.stepBody>div {
+  max-width: 100%;
+}
+div.stepSum {
+  display: block;
+  border:1px dotted ;
+}
+div.stepDesc {
+  display: block;
+}
+div.stepFoot {
+  clear:both;
+}
+textarea {
+  width: 95%;
+}
+#stepsHead {
+  display: none ;
+}
+</style>
+</head>
+<body>
+  <!--div id="step1_note_toggler">
+    <br />
+    <a style="text-decoration:none" href="javascript:;" onmousedown="toggleDiv('step1_note','block',' Note:');">&#x25B6;</a>
+    <a style="color:black; text-decoration:none" href="javascript:;" onmousedown="toggleDiv('step1_note','block',' Note:');"> Note:</a>
+  </div>
+  <div id="step1_note" style="display:none">
+    <textarea class="boxsizingBorder" name="step1_note" form="step1_form" rows="10"></textarea>
+  </div-->
+  <div id="step2_note_toggler">
+    <br />
+    <div class="arrow" style="text-decoration:none;display:inline-block;" href="javascript:;" onmousedown="alert(window.event);$('#step2_note').toggle(); if ( $('#step2_note').is(':visible') ) { $('#step2_note_toggler div.arrow').html('&#x25BC; Debug:') } else { $('#step2_note_toggler div.arrow').html('&#x25B6; Debug') } ">&#x25B6; Debug</div>
+  </div>
+  <div id="step2_note" style="display:none">
+    <textarea class="boxsizingBorder" name="step2_note" form="step2_form" rows="10"></textarea>
+  </div>
+
+<div id="stepsHead" >
+</div>
+<div id="stepsDiv">
+</div>
+<script>
+//<![CDATA[
+var steps = {sum:'Some process', desc:'',
+  subs:[
+    {num:'4.3', sum:'step 4.3', desc:'step 4.3 desc long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long <a href="http://google.com">google</a> long long long long long long long long long long long long long long long long long',
+      subs:[
+      ],
+    },
+    {num:'4.4', sum:'step 4.4', desc:'step 4.4 desc',
+      subs:[
+        //{num:'4.4.1', sum:'step 4.4.1', desc:'step 4.4.1 desc'},
+        {sum:'step 4.4.1 ?', desc:'step 4.4.1 desc'},
+        {sum:'step 4.4.2 ?', desc:'step 4.4.2 desc',data:{measurement1:''}},
+      ],
+    },
+    {num:'7.5', sum:'step 7.5', desc:'step 7.5 desc',
+      subs:[
+      ],
+    },
+  ],
+} ;
+writeSteps(steps) ;
+//]]>
+</script>
+</body>
+</html>
