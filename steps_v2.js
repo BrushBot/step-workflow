@@ -149,7 +149,7 @@ function createObj() {
         } else {
           orSet( this, 'tag', 'input' ) ;
           orSet( this, 'attribs', {} ) ;
-          orSet( this.attribs, 'type', 't' ) ;
+          orSet( this.attribs, 'type', 'text' ) ;
         }
         return( this.tag ) ;
       },
