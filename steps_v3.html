@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+<meta charset="UTF-8">
+<title>Nested Step Workflow, Scientific Notebook, and Experiment Journal</title>
+<!--script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"-->
+<script src="jquery.min.js">
+</script>
+<script src="Blob.js">
+</script>
+<script src="FileSaver.js">
+</script>
+<script src="steps_v3.js">
+</script>
+<script>
+//<![CDATA[
+var stepConfig = {
+  elemStruct: {
+    'stepDiv': ['stepLeft', 'stepBody', 'stepFoot'],
+    'stepBody': ['stepSum', 'stepDesc', 'stepData', 'stepSubs'],
+    'stepLeft': ['stepNum', 'stepStat', 'stepChecks'],
+    'stepChecks': ['stepDoneWrap', 'stepSkipWrap', 'stepFailWrap'],
+    'stepDoneWrap': ['stepDone'],
+    'stepSkipWrap': ['stepSkip'],
+    'stepFailWrap': ['stepFail'],
+  },
+  defaultDataTypes: [
+    'notes',
+  ],
+  dataTypes: {
+    'notes': {'rows': 4},
+    'measurement1': {'rows': 1, 'label': 'Meas1: '},
+  },
+  //jsonPrettyPrint: null,
+  jsonPrettyPrint: 2,
+} ;
+$(document).ready(function() {
+  //$(".checkbox").change(function() {
+  $( "input:checkbox" ).change(function(e) {
+    e = e || window.event;
+    var elementId = e.target ? e.target.id : e.srcElement.id ;
+    if(this.checked) {
+      var d=new Date();
+      d = d.toISOString() ;
+      d = d.replace(/[.]\d+z$/ig, '') ; 
+      d = d.replace(/[\s:-]/g, '') ; 
+      //alert( d + ' ' + this.id) ;
+      var elem = $(elementId) ;
+      var checkType = elementId.replace(/^step/, '' ) ;
+      checkType = checkType.replace(/_\d+$/, '' ) ;
+      checkType = checkType.toLowerCase() ;
+      var idNum = elementId.replace(/^.*_(\d+)$/, "$1") ;
+      if ( idNum ) {
+        var step = stepSet.byId[idNum] ;
+        step[checkType] = d ;
+      }
+      checkType = '' ;
+    }
+  });
+  function persistTextarea(id){
+    var elem = $("#" + id ) ;
+    var valid1 = false ;
+    //alert( id + "\n" + debugObj( elem ) + "\n" + debugObj( elem[0] ) ) ;
+    //alert( id + "\n" + elem.prop("tagName") + "\n" + elem.attr('type') ) ;
+    //if ( 'input' == elem.attr('tag') ) {
+    if ( elem.prop("tagName").match(/input/i) ) {
+      //alert( 'hi' ) ;
+      if ( elem.attr('type').match(/text/i) ) {
+        elem.attr('value', elem.val()) ;
+        valid1 = true ;
+      }
+    } else if ( elem.prop("tagName").match(/textarea/i) ) {
+      //if ('textarea' != elem.attr('tag') ) {
+      //  elem = $("#" + id + " textarea") ;
+      //}
+      elem.html(elem.val()) ;
+      //elem.value(elem.val()) ;
+      //document.getElementById(id).value = elem.val() ;
+      //elem.placeholder(elem.val()) ;
+      valid1 = true ;
+    }
+    if ( valid1 ) {
+      var dataType = elem.attr('name') ;
+      dataType = dataType.replace(/_\d+$/, '') ;
+      var idNum = id.replace(/^.*_(\d+)$/, "$1") ;
+      if ( idNum ) {
+        var step = stepSet.byId[idNum] ;
+        orSet(step, 'data', {}) ;
+        step['data'][dataType] = elem.val() ;
+      }
+    }
+  } ;
+  function triggerTextarea(e){
+    e = e || window.event;
+    var elementId = e.target ? e.target.id : e.srcElement.id ;
+    persistTextarea(elementId) ;
+  } ;
+  $('input').keyup(function(e){ triggerTextarea(e) } ) ;
+  $('input').change(function(e){ triggerTextarea(e) } ) ;
+  $('textarea').keyup(function(e){ triggerTextarea(e) } ) ;
+  $('textarea').change(function(e){ triggerTextarea(e) } ) ;
+  
+  // //stepSet.textAreas.forEach(function(el){
+  // forEachIn(stepSet.textAreas, function(key1, val1) {
+    // document.getElementById( key1 ).value = val1 ;
+    // // var p = 'q' ;
+  // });
+});
+//]]>
+</script>
+<style type="text/css">
+div.stepDiv {
+  border:2px solid;
+  border-radius:20px;
+  padding:10px 4px 7px 10px;
+}
+div.stepLeft {
+  float:left;
+  border:1px solid;
+  border-radius:20px;
+  padding:5px 5px;
+  max-width: 25%;
+}
+div.stepBody {
+  /* float:left;
+  max-width: 83%;
+  min-width: 70%;
+  margin:5px 1px 2px 5px; */
+  margin:0 0 0 70px ;
+  
+}
+div.stepBody>div {
+  max-width: 100%;
+}
+div.stepSum {
+  display: block;
+  border:1px dotted ;
+}
+div.stepDesc {
+  display: block;
+}
+div.stepFoot {
+  clear:both;
+}
+textarea {
+  width: 95%;
+}
+#stepsHead {
+  /* display: none ; */
+}
+div.stepData {
+  border:1px dotted ;
+  
+}
+div.stepData div {
+  margin:0 0 0 5px ;
+}
+</style>
+</head>
+<body>
+<div id="stepsHead" >
+Enter Your Name: <input type="text" id="UserName" name="UserName" value="Your Name"></input>
+</div>
+<div id="stepsDiv">
+</div>
+<script>
+//<![CDATA[
+var steps = {sum:'Some process', desc:'',
+  subs:[
+    {num:'4.3', sum:'step 4.3', desc:'step 4.3 desc long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long <a href="http://google.com">google</a> long long long long long long long long long long long long long long long long long',
+      subs:[],
+    },
+    {num:'4.4', sum:'step 4.4', desc:'step 4.4 desc',
+      subs:[
+        //{num:'4.4.1', sum:'step 4.4.1', desc:'step 4.4.1 desc'},
+        {sum:'step 4.4.1 ?', desc:'step 4.4.1 desc'},
+        {sum:'step 4.4.2 ?', desc:'step 4.4.2 desc',data:{measurement1:'1', notes:'xyzzy'}},
+      ],
+    },
+    {num:'7.5', sum:'step 7.5', desc:'step 7.5 desc',
+      subs:[
+      ],
+    },
+  ],
+} ;
+writeSteps(steps) ;
+//]]>
+</script>
+</body>
+</html>
