@@ -483,6 +483,100 @@ function createObj() {
       },
     }) ;
     
+    
+    
+// StepData
+
+    var StepDataElem = StepElem.extend({
+      construct: function(argObj) {
+        if ( ( "[object Arguments]" == toClass.call(argObj) ) && argObj[0]){
+          argObj = argObj[0] ;
+        }
+        StepElem.construct.call(this, argObj) ;
+        var stepX = stepSet.byId[this.id] ;
+        var sConfig = getStepConfig() ;
+        if ( sConfig['defaultDataTypes'].length > 0 ) {
+          orSet( stepX, 'data', {} ) ;
+          sConfig['defaultDataTypes'].forEach(function(el, i){
+            orSet( stepX.data, el, '' ) ;
+          }) ;
+        }
+      },
+      write: function(content) {
+        var txt ;
+        content = content || '' ;
+        var thisElem = this ;
+        //var thisStep = this ;
+        var stepX = stepSet.byId[this.id] ;
+        // if ( stepX.data.length > 0 ) {
+          // stepX.data.forEach(function(el, i){
+        var sConfig = getStepConfig() ;
+        forEachIn( stepX.data, function( key1, val1 ) {
+          var rowsX = 1 ;
+          if (isDef( sConfig['dataTypes'][key1]['rows'] )) {
+            rowsX = sConfig['dataTypes'][key1]['rows'] ;
+          }
+          //var subStepX = elemMaker({'step': thisStep, 'class1': 'stepTextElem', 'rows': rowsX, '_name': key1, 'name': key1 + stepX.id}) ;
+          var subStepX = elemMaker({'step': thisElem.step, 'class1': 'stepTextElem', 'rows': rowsX, '_name': key1, 'name': key1 + stepX.id}) ;
+          var label1 = sConfig['dataTypes'][key1]['label'] ;
+          label1 = label1 || ( key1.charAt(0).toUpperCase() + key1.slice(1) + ': ' ) ;
+          if ( rowsX > 1 ) {
+            label1 += '<br />' ;
+          }
+          var subStepWrap = elemMaker({'step': thisElem.step, 'class1': 'stepTextElemWrap'}) ;
+          content += subStepWrap.write(label1 + subStepX.write()) ;
+        }) ;
+        // var dataLabel = elemMaker({'step': thisElem.step, 'class1': 'stepDataLabel'}) ;
+        // var dataWrap = elemMaker({'step': thisElem.step, 'class1': '
+        txt = StepElem.write.call(this, content) ;
+        return( txt ) ;
+      },
+    }) ;
+
+
+
+// StepTextLineElem
+
+    var StepTextLineElem = StepElem.extend({
+      getTag: function() { return( 'input' ) },
+      getAttribsParent: InputElem.getAttribs,
+      getAttribs: function() {
+        var attribs = StepCheckElem.getAttribsParent.call(this) ;
+        attribs.type = 'text' ;
+        attribs.value = this.getVal() ;
+        return(attribs) ;
+      },
+      getVal: function(step) {
+        step = step || this.step ;
+        orSet( step, 'data', {} ) ;
+        if ( isDef( step.data[this['_name'] ] ) ) {
+          return( step.data[this['_name'] ] ) ;
+        }
+        return( '' ) ;
+      },
+    }) ;
+    
+    
+    
+// StepTextAreaElem
+
+    var StepTextAreaElem = StepElem.extend({
+      getTag: function() { return( 'textarea' ) },
+      //getAttribsParent: InputElem.getAttribs,
+      getAttribs: function() {
+        var attribs = {} ;
+        attribs.value = this.getVal() ;
+        var rowsX = 1 ;
+        if ( isDef( this['rows'] ) ) {
+          rowsX = this['rows'] ;
+        }
+        attribs['rows'] = rowsX ;
+        attribs['name'] = this['name'] ;
+        return(attribs) ;
+      },
+      getVal: StepTextLineElem.getVal,
+    }) ;
+    
 // 
 
 
@@ -520,7 +614,14 @@ function getStepConfig() {
 //
 
 
-function arrowToggle() {
+function arrowToggle(event1) {
+  
+  $('#step2_note').toggle();
+  if ( $('#step2_note').is(':visible') ) {
+    $('#step2_note_toggler div.arrow').html('&#x25BC; Debug:')
+  } else {
+    $('#step2_note_toggler div.arrow').html('&#x25B6; Debug')
+  }
 } ;
 function debugObj(obj) {
   var msg = '' ;
@@ -545,7 +646,17 @@ function elemMaker(argObj){
       // 'stepDesc': 'StepDescElem',
       // 'stepStat': 'StepStatElem',
     } ;
-    if (isDef(map[argObj.class1])) {
+    if ('stepData' == argObj.class1) {
+      console.log('stepData') ;
+    }
+    if ('stepTextElem' == argObj.class1) {
+      orSet( argObj, 'rows', 1 ) ;
+      if ( argObj.rows == 1 ) {
+        return( StepTextLineElem.create(argObj) ) ;
+      } else {
+        return( StepTextAreaElem.create(argObj) ) ;
+      }
+    } else if (isDef(map[argObj.class1])) {
       // // return( new map[argObj.class1](argObj) ) ;
       //var function1 = eval(map[argObj.class1]) ;
       //return( new function1(argObj) ) ;
@@ -618,12 +729,27 @@ function saveIt() {
   if(!fail) {
   var elem1 = $('html') ;
   var txt = $('html').val() ;
+  var footer = "<div id=\"stepsDiv\">\n</div>\n<script>\n//<![CDATA[\nvar steps = " ;
+  footer += JSON.stringify(steps, null, stepConfig['jsonPrettyPrint']) ;
+  footer += ";\nwriteSteps(steps) ;\n//]" + ']' + '>' ;
+  footer += "\n</script>\n</body>\n</html>" ;
   txt = (new XMLSerializer).serializeToString(document) ;
+  var split1 = txt.split( /[<]div id[=]["']stepsDiv["'][>]/ ) ;
+  txt = split1[0] + footer ;
+  var file1 = window.location.pathname.split("/").pop();
+  var d=new Date();
+  d = d.toISOString() ;
+  d = d.replace(/[.]\d+z$/ig, '') ; 
+  d = d.replace(/[\s:-]/g, '') ; 
+  var ext1 = file1.match(/[.]x?html$/i) ;
+  ext1 = ext1 || '.html' ;
+  file1 = file1.replace(/[.]x?html$/i, '-d' + d + ext1 );
   var blob = new Blob([txt], {type: "text/html;charset=utf-8"});
-  saveAs(blob, "testSave.html");
+  //saveAs(blob, "testSave.html");
+  saveAs(blob, file1);
   //var blob = bb.getBlob("application/xhtml+xml;charset=" + document.characterSet);
   }
-  console.log("Snart") ;
+  //console.log("Snart") ;
 }
 function unDef(var1) {
   if ( typeof(var1) == "undefined" ) {
@@ -681,8 +807,9 @@ var stepSet = {
     this.byId[step.id] = step ;
     // if ( !typeof(parentStep) == "undefined") {
     if ( isDef(parentStep) ) {
-      this.getParent[step.id] = parent.id ;
-      parentStep
+      //this.getParent[step.id] = parent.id ;
+      this.parent[step.id] = parentStep.id ;
+      // parentStep
     }
     if (isDef(step.subs)){
       step.subs.every(function(el){

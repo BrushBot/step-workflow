@@ -58,13 +58,18 @@ var stepConfig = {
     'notes': {'rows': 4},
     'measurement1': {'rows': 1},
   },
+  //jsonPrettyPrint: null,
+  jsonPrettyPrint: 2,
 } ;
 $(document).ready(function() {
   //$(".checkbox").change(function() {
   $( "input:checkbox" ).change(function() {
     if(this.checked) {
       var d=new Date();
-      alert( d.toISOString() + ' ' + this.id) ;
+      d = d.toISOString() ;
+      d = d.replace(/[.]\d+z$/ig, '') ; 
+      d = d.replace(/[\s:-]/g, '') ; 
+      alert( d + ' ' + this.id) ;
     }
   });
   function persistTextarea(id){
@@ -76,6 +81,12 @@ $(document).ready(function() {
   } ;
   $('#step2_note textarea').keyup(function(){persistTextarea('step2_note')}) ;
   $('#step2_note textarea').change(function(){persistTextarea('step2_note')}) ;
+  $('#step2_note_toggler>div').mousedown(function(e){
+    e = e || window.event;
+    var elementId = e.target ? e.target.id : e.srcElement.id ;
+    alert( 'onmousedown ' + e + ' elementId ' + elementId + "\n" + debugObj(e) ) ;
+  }) ;
+  
 });
 //]]>
 </script>
@@ -119,6 +130,13 @@ textarea {
 #stepsHead {
   display: none ;
 }
+div.stepData {
+  border:1px dotted ;
+  
+}
+div.stepData div {
+  margin:0 0 0 5px ;
+}
 </style>
 </head>
 <body>
@@ -132,7 +150,8 @@ textarea {
   </div-->
   <div id="step2_note_toggler">
     <br />
-    <div class="arrow" style="text-decoration:none;display:inline-block;" href="javascript:;" onmousedown="alert(window.event);$('#step2_note').toggle(); if ( $('#step2_note').is(':visible') ) { $('#step2_note_toggler div.arrow').html('&#x25BC; Debug:') } else { $('#step2_note_toggler div.arrow').html('&#x25B6; Debug') } ">&#x25B6; Debug</div>
+    <!--div class="arrow" style="text-decoration:none;display:inline-block;" href="javascript:;" onmousedown="function(e){alert(e);$('#step2_note').toggle(); if ( $('#step2_note').is(':visible') ) { $('#step2_note_toggler div.arrow').html('&#x25BC; Debug:') } else { $('#step2_note_toggler div.arrow').html('&#x25B6; Debug') } }.call">&#x25B6; Debug</div-->
+    <div id="step2_note_arrow" class="arrow" style="text-decoration:none;display:inline-block;" href="javascript:;">&#x25B6; Debug</div>
   </div>
   <div id="step2_note" style="display:none">
     <textarea class="boxsizingBorder" name="step2_note" form="step2_form" rows="10"></textarea>
@@ -147,8 +166,7 @@ textarea {
 var steps = {sum:'Some process', desc:'',
   subs:[
     {num:'4.3', sum:'step 4.3', desc:'step 4.3 desc long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long <a href="http://google.com">google</a> long long long long long long long long long long long long long long long long long',
-      subs:[
-      ],
+      subs:[],
     },
     {num:'4.4', sum:'step 4.4', desc:'step 4.4 desc',
       subs:[
